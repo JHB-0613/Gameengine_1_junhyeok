@@ -6,11 +6,10 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 5.0f;
 
     [Header("점프 설정")]
-    public float jumpForce = 5.0f;
+    public float jumpForce = 10.0f;
 
     private Animator animator;
     private Rigidbody2D rb;
-    private float lastJumpTime = 0f;
     public float jumpCooldown = 0.2f;
     private bool isGrounded = false;  // 바닥에 닿아있는지 여부
     private int score = 0;
@@ -41,25 +40,25 @@ public class PlayerController : MonoBehaviour
         // 물리 기반 이동
         rb.linearVelocity = new Vector2(moveX * moveSpeed, rb.linearVelocity.y);
 
-        // 점프 입력
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 점프 처리
+        HandleJump();
+
+        // 애니메이션
+        float currentSpeed = Mathf.Abs(rb.linearVelocity.x);
+        animator.SetFloat("Speed", currentSpeed);
+    }
+
+    /// <summary>
+    /// 캐릭터의 점프 로직을 처리합니다.
+    /// </summary>
+    private void HandleJump()
+    {
+        // Space 키를 눌렀고, 캐릭터가 바닥에 있을 때 점프 실행
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             Debug.Log("점프!");
         }
-        if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * 0.5f);
-        }
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded &&
-            Time.time - lastJumpTime > jumpCooldown)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-            lastJumpTime = Time.time;
-        }
-        // 애니메이션
-        float currentSpeed = Mathf.Abs(rb.linearVelocity.x);
-        animator.SetFloat("Speed", currentSpeed);
     }
     // 바닥 충돌 감지 (Collision)
     void OnCollisionEnter2D(Collision2D collision)
