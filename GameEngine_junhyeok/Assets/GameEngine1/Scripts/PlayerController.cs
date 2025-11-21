@@ -1,5 +1,8 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
     [Header("이동 설정")]
@@ -10,6 +13,7 @@ public class PlayerController : MonoBehaviour
 
     private Animator animator;
     private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
     public float jumpCooldown = 0.2f;
     private bool isGrounded = false;  // 바닥에 닿아있는지 여부
     private int score = 0;
@@ -19,6 +23,7 @@ public class PlayerController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         
         // 게임 시작 시 위치를 저장 - 새로 추가!
         startPosition = transform.position;
@@ -39,6 +44,19 @@ public class PlayerController : MonoBehaviour
 
         // 물리 기반 이동
         rb.linearVelocity = new Vector2(moveX * moveSpeed, rb.linearVelocity.y);
+
+        // 방향 전환: 이동 입력이 있을 때만 방향을 바꿉니다.
+        if (moveX != 0)
+        {
+            if (moveX > 0)
+            {
+                transform.localScale = new Vector3(1, 1, 1); // 오른쪽을 보도록 원래대로
+            }
+            else
+            {
+                transform.localScale = new Vector3(-1, 1, 1); // 왼쪽을 보도록 반전
+            }
+        }
 
         // 점프 처리
         HandleJump();
